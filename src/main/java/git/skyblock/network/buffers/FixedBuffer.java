@@ -1,4 +1,4 @@
-package git.skyblock.network;
+package git.skyblock.network.buffers;
 
 import git.skyblock.util.Flags;
 

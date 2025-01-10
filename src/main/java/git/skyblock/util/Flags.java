@@ -20,6 +20,8 @@ public class Flags
     public static boolean SOCKET_REUSE_ADDRESS = true;
     @ServerFlag(value = "--big-endian", type = ServerFlagType.BOOLEAN)
     public static boolean ENDIAN_CONVERSION = ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN;
+    @ServerFlag(value = "--port", type = ServerFlagType.INT)
+    public static int SERVER_PORT = 25565;
     // threading
     @ServerFlag(value = "--multi-threaded", type = ServerFlagType.BOOLEAN)
     public static boolean MULTI_THREADED = true;

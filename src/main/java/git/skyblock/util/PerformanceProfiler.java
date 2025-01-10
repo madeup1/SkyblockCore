@@ -34,4 +34,9 @@ public class PerformanceProfiler
         profiles.forEach((c, k) -> System.out.println(c + ": " + k + "ms"));
         System.out.println("---  PROFILER END  ---");
     }
+
+    public long time(String section)
+    {
+        return profiles.get(section);
+    }
 }

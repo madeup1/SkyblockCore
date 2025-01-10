@@ -3,6 +3,7 @@ package git.skyblock.world;
 import git.skyblock.blocks.Block;
 import git.skyblock.position.Vec2;
 import git.skyblock.position.Vec3;
+import git.skyblock.util.Lock;
 
 public interface IWorldProvider
 {
@@ -19,4 +20,6 @@ public interface IWorldProvider
     Chunk getChunk(Vec2 vec);
     void setChunk(Chunk chunk, int x, int z);
     void setChunk(Chunk chunk, Vec2 vec);
+
+    Lock getLock();
 }

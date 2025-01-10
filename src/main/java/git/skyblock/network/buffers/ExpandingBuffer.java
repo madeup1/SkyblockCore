@@ -1,4 +1,4 @@
-package git.skyblock.network;
+package git.skyblock.network.buffers;
 
 import git.skyblock.util.Flags;
 
@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExpandingBuffer
 {

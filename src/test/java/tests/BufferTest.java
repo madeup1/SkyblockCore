@@ -1,7 +1,7 @@
 package tests;
 
-import git.skyblock.network.ExpandingBuffer;
-import git.skyblock.network.FixedBuffer;
+import git.skyblock.network.buffers.ExpandingBuffer;
+import git.skyblock.network.buffers.FixedBuffer;
 
 import java.util.Arrays;
 import java.util.UUID;
