@@ -1,11 +1,18 @@
 package git.skyblock.protocol.s2c.login;
 
+import git.skyblock.chat.ChatComponent;
 import git.skyblock.network.buffers.ExpandingBuffer;
 import git.skyblock.protocol.ConnectionState;
 import git.skyblock.protocol.IServerPacket;
 
 public class DisconnectPacket implements IServerPacket
 {
+    private ChatComponent reason;
+    public DisconnectPacket(String reason)
+    {
+        this.reason = new ChatComponent(reason);
+    }
+
     @Override
     public int id(ConnectionState state)
     {
@@ -17,6 +24,6 @@ public class DisconnectPacket implements IServerPacket
     @Override
     public void write(ExpandingBuffer buffer)
     {
-
+        buffer.writeString(reason.toString());
     }
 }

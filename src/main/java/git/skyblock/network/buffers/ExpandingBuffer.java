@@ -48,6 +48,22 @@ public class ExpandingBuffer
         this.write(data);
     }
 
+    public void writeIntBefore(int value)
+    {
+        if (Flags.ENDIAN_CONVERSION)
+        {
+            value = Integer.reverseBytes(value);
+        }
+
+        byte[] data = new byte[4];
+        for (int i = 0; i < 4; i++)
+        {
+            data[i] = (byte) (value >> (24 - (i * 8)));
+        }
+
+        this.writeBefore(data);
+    }
+
     public void writeFloat(float fValue)
     {
         int value = Float.floatToIntBits(fValue);
@@ -71,6 +87,17 @@ public class ExpandingBuffer
         }
 
         this.writeByte((byte) value);
+    }
+
+    public void writeVarIntBefore(int value)
+    {
+        while ((value & -128) != 0)
+        {
+            this.writeByteBefore((byte) (value & 127 | 128));
+            value >>= 7;
+        }
+
+        this.writeByteBefore((byte) value);
     }
 
     public void writeVarLong(long value)
@@ -122,9 +149,23 @@ public class ExpandingBuffer
         this.links.addLast(segment);
     }
 
+    public void writeBefore(byte[] data)
+    {
+        BufferSegment segment = new BufferSegment(data, data.length);
+
+        this.length += data.length;
+
+        this.links.addFirst(segment);
+    }
+
     public void writeByte(byte value)
     {
         this.write(new byte[]{value});
+    }
+
+    public void writeByteBefore(byte value)
+    {
+        this.writeBefore(new byte[]{value});
     }
 
     public byte[] compile()
@@ -141,6 +182,11 @@ public class ExpandingBuffer
         }
 
         return data;
+    }
+
+    public int length()
+    {
+        return this.length;
     }
 
     public byte[] getBytes()

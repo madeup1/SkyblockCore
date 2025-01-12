@@ -159,6 +159,11 @@ public class FixedBuffer
         return index + length <= data.length;
     }
 
+    public int length()
+    {
+        return this.data.length;
+    }
+
     public byte[] getBytes()
     {
         return this.data;

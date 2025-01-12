@@ -3,6 +3,7 @@ package git.skyblock.network;
 import git.skyblock.util.Lock;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
 public class ConnectionManager
 {
@@ -12,6 +13,17 @@ public class ConnectionManager
     public ConnectionManager()
     {
         this.connections = new LinkedList<>();
+    }
+
+    public void forEach(Consumer<PlayerConnection> consumer)
+    {
+        if (count == 0)
+        {
+            return;
+        }
+        lock.lock();
+        connections.forEach(consumer);
+        lock.unlock();
     }
 
     public void add(PlayerConnection connection)

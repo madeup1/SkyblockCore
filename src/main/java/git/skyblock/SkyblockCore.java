@@ -2,7 +2,9 @@ package git.skyblock;
 
 import git.skyblock.materials.MaterialRegistry;
 import git.skyblock.network.ConnectionManager;
+import git.skyblock.network.PlayerConnection;
 import git.skyblock.network.SocketListener;
+import git.skyblock.protocol.PacketManager;
 import git.skyblock.util.Logger;
 import git.skyblock.util.PerformanceProfiler;
 
@@ -14,6 +16,7 @@ public class SkyblockCore
     private static final PerformanceProfiler profiler = new PerformanceProfiler();
     private static final ConnectionManager connections = new ConnectionManager();
     private static final SocketListener listener = new SocketListener();
+    private static final PacketManager packets = new PacketManager();
     private static final Logger logger = new Logger("main");
 
     private static boolean running = false;
@@ -26,7 +29,7 @@ public class SkyblockCore
         profiler().end("init");
     }
 
-    public static void start() throws SocketException
+    public static void start() throws Exception
     {
         profiler.clear();
         profiler.start("listener");
@@ -48,7 +51,9 @@ public class SkyblockCore
             {
                 lastTick = System.currentTimeMillis();
                 profiler.start("tick");
+
                 tick();
+
                 profiler.end("tick");
 
                 if (profiler.time("tick") >= 50)
@@ -56,6 +61,8 @@ public class SkyblockCore
                     logger().warn("section [TICK] took " + profiler.time("tick") + "\nTPS will likely be under 20!");
                 }
             }
+
+            listener.poll();
 
             if (profiler.time("frame") >= 40)
             {
@@ -66,7 +73,11 @@ public class SkyblockCore
 
     public static void tick()
     {
-        logger().info("Tick!");
+        // logger().info("Tick!");
+
+        connections().forEach(PlayerConnection::poll);
+
+        // logger().info("pass");
     }
 
     public static void stop()
@@ -87,6 +98,11 @@ public class SkyblockCore
     public static ConnectionManager connections()
     {
         return connections;
+    }
+
+    public static PacketManager packets()
+    {
+        return packets;
     }
 
     public static Logger logger()

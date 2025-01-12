@@ -5,9 +5,12 @@ import git.skyblock.optimizations.Threadable;
 import git.skyblock.util.Flags;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class SocketListener
 {
@@ -25,11 +28,12 @@ public class SocketListener
         }
     }
 
-    public void start() throws SocketException
+    public void start() throws Exception
     {
         this.running = true;
         this.socket.setReuseAddress(Flags.SOCKET_REUSE_ADDRESS);
         this.socket.setReceiveBufferSize(Flags.SOCKET_BUFFER_SIZE_RECEIVE);
+        this.socket.setSoTimeout(1);
     }
 
     public void poll()
@@ -42,7 +46,7 @@ public class SocketListener
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+
         }
     }
 
