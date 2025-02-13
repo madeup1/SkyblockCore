@@ -1,6 +1,7 @@
 package git.skyblock.network;
 
 import git.skyblock.SkyblockCore;
+import git.skyblock.crypt.CryptPair;
 import git.skyblock.entities.EntityPlayer;
 import git.skyblock.network.buffers.ExpandingBuffer;
 import git.skyblock.network.buffers.FixedBuffer;
@@ -35,9 +36,7 @@ public class PlayerConnection
     private String name;
     private UUID uuid;
     private int protocol = 0;
-    private SecretKeySpec sharedSecret;
-    private Cipher decryptCipher;
-    private Cipher encryptCipher;
+    private CryptPair cryptPair;
 
     // player
     private EntityPlayer localPlayer;
@@ -134,9 +133,9 @@ public class PlayerConnection
                 byte[] data = new byte[packetLen];
                 int check = inputStream.read(data);
 
-                if (sharedSecret != null)
+                if (cryptPair != null)
                 {
-                    data = decryptCipher.doFinal(data);
+                    data = cryptPair.decrypt(data);
                 }
 
                 FixedBuffer buffer = new FixedBuffer(data);
@@ -288,26 +287,13 @@ public class PlayerConnection
         }
     }
 
-    public SecretKeySpec getSharedSecret()
+    public CryptPair cryptPair()
     {
-        return this.sharedSecret;
+        return this.cryptPair;
     }
 
     public void setSharedSecret(SecretKeySpec spec)
     {
-        this.sharedSecret = spec;
-        try
-        {
-            this.decryptCipher = Cipher.getInstance("RSA");
-            this.decryptCipher.init(Cipher.DECRYPT_MODE, sharedSecret);
-
-            this.encryptCipher = Cipher.getInstance("RSA");
-            this.encryptCipher.init(Cipher.ENCRYPT_MODE, sharedSecret);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            this.disconnect();
-        }
+        this.cryptPair = new CryptPair(spec);
     }
 }

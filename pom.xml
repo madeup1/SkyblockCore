@@ -21,7 +21,6 @@
             <artifactId>json</artifactId>
             <version>20241224</version>
         </dependency>
-
     </dependencies>
 
 </project>

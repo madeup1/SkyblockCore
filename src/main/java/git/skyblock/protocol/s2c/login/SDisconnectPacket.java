@@ -16,9 +16,7 @@ public class SDisconnectPacket implements IServerPacket
     @Override
     public int id(ConnectionState state)
     {
-        if (state == ConnectionState.Play)
-            return 0x40;
-        return 0x00;
+        return state == ConnectionState.Play ? 0x40 : 0x00;
     }
 
     @Override
