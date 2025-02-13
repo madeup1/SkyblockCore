@@ -1,5 +1,6 @@
 package git.skyblock;
 
+import git.skyblock.crypt.EncryptionManager;
 import git.skyblock.materials.MaterialRegistry;
 import git.skyblock.network.ConnectionManager;
 import git.skyblock.network.PlayerConnection;
@@ -17,6 +18,7 @@ public class SkyblockCore
     private static final ConnectionManager connections = new ConnectionManager();
     private static final SocketListener listener = new SocketListener();
     private static final PacketManager packets = new PacketManager();
+    private static final EncryptionManager encryption = new EncryptionManager();
     private static final Logger logger = new Logger("main");
 
     private static boolean running = false;
@@ -24,9 +26,9 @@ public class SkyblockCore
 
     public static void init() throws Exception
     {
-        profiler().start("init");
+        profiler.start("init");
         materials.load("items.json");
-        profiler().end("init");
+        profiler.end("init");
     }
 
     public static void start() throws Exception
@@ -63,6 +65,7 @@ public class SkyblockCore
             }
 
             listener.poll();
+            connections().forEach(PlayerConnection::poll);
 
             if (profiler.time("frame") >= 40)
             {
@@ -74,8 +77,6 @@ public class SkyblockCore
     public static void tick()
     {
         // logger().info("Tick!");
-
-        connections().forEach(PlayerConnection::poll);
 
         // logger().info("pass");
     }
@@ -103,6 +104,11 @@ public class SkyblockCore
     public static PacketManager packets()
     {
         return packets;
+    }
+
+    public static EncryptionManager encryption()
+    {
+        return encryption;
     }
 
     public static Logger logger()

@@ -9,9 +9,9 @@ public class Flags
 {
     // socket
     @ServerFlag(value = "--socket-buffer-size-receive", type = ServerFlagType.INT)
-    public static int SOCKET_BUFFER_SIZE_RECEIVE = 2048;
+    public static int SOCKET_BUFFER_SIZE_RECEIVE = 4096;
     @ServerFlag(value = "--socket-buffer-size-send", type = ServerFlagType.INT)
-    public static int SOCKET_BUFFER_SIZE_SEND = 2048;
+    public static int SOCKET_BUFFER_SIZE_SEND = 4096;
     @ServerFlag(value = "--socket-no-delay", type = ServerFlagType.BOOLEAN)
     public static boolean SOCKET_NO_DELAY = true;
     @ServerFlag(value = "--socket-timeout", type = ServerFlagType.INT)
@@ -24,7 +24,7 @@ public class Flags
     public static int SERVER_PORT = 25565;
     // threading
     @ServerFlag(value = "--multi-threaded", type = ServerFlagType.BOOLEAN)
-    public static boolean MULTI_THREADED = true;
+    public static boolean MULTI_THREADED = false;
 
     public static void parse(String[] args)
     {

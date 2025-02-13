@@ -5,10 +5,10 @@ import git.skyblock.network.buffers.ExpandingBuffer;
 import git.skyblock.protocol.ConnectionState;
 import git.skyblock.protocol.IServerPacket;
 
-public class DisconnectPacket implements IServerPacket
+public class SDisconnectPacket implements IServerPacket
 {
     private ChatComponent reason;
-    public DisconnectPacket(String reason)
+    public SDisconnectPacket(String reason)
     {
         this.reason = new ChatComponent(reason);
     }

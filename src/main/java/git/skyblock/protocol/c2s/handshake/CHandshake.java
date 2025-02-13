@@ -41,5 +41,6 @@ public class CHandshake implements IClientPacket
             return;
         }
         connection.setState(state);
+        connection.setProtocol(this.protocolVersion);
     }
 }

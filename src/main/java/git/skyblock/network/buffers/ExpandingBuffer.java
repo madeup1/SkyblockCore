@@ -1,11 +1,11 @@
 package git.skyblock.network.buffers;
 
+import git.skyblock.SkyblockCore;
 import git.skyblock.util.Flags;
+import git.skyblock.util.PacketUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 public class ExpandingBuffer
 {
@@ -83,7 +83,7 @@ public class ExpandingBuffer
         while ((value & -128) != 0)
         {
             this.writeByte((byte) (value & 127 | 128));
-            value >>= 7;
+            value >>>= 7;
         }
 
         this.writeByte((byte) value);
@@ -94,10 +94,8 @@ public class ExpandingBuffer
         while ((value & -128) != 0)
         {
             this.writeByteBefore((byte) (value & 127 | 128));
-            value >>= 7;
+            value >>>= 7;
         }
-
-        this.writeByteBefore((byte) value);
     }
 
     public void writeVarLong(long value)
@@ -163,6 +161,13 @@ public class ExpandingBuffer
         this.write(new byte[]{value});
     }
 
+    public void writeByteArray(byte[] value)
+    {
+        this.writeVarInt(value.length);
+        SkyblockCore.logger().info("write length is " + value.length);
+        this.write(value);
+    }
+
     public void writeByteBefore(byte value)
     {
         this.writeBefore(new byte[]{value});
@@ -182,6 +187,12 @@ public class ExpandingBuffer
         }
 
         return data;
+    }
+
+    public void clear()
+    {
+        this.links.clear();
+        this.length = 0;
     }
 
     public int length()

@@ -8,11 +8,22 @@ import java.util.UUID;
 
 public class FixedBuffer
 {
-    private final byte[] data;
+    private byte[] data;
     private int index = 0;
     public FixedBuffer(byte[] data)
     {
         this.data = data;
+    }
+
+    public void setData(byte[] data)
+    {
+        this.data = data;
+        this.index = 0;
+    }
+
+    public byte[] remainder()
+    {
+        return read(this.data.length - index);
     }
 
     public int readInt()

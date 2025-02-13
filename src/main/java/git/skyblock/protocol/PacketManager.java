@@ -2,7 +2,9 @@ package git.skyblock.protocol;
 
 import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.protocol.c2s.handshake.CHandshake;
+import git.skyblock.protocol.c2s.login.CEncryptionResponse;
 import git.skyblock.protocol.c2s.login.CLoginStart;
+import git.skyblock.protocol.c2s.status.CStatusPing;
 import git.skyblock.protocol.c2s.status.CStatusRequest;
 
 import java.util.HashMap;
@@ -25,8 +27,10 @@ public class PacketManager
         put(Handshake, 0, CHandshake::new);
         // status
         put(Status, 0, CStatusRequest::new);
+        put(Status, 1, CStatusPing::new);
         // login
         put(Login, 0, CLoginStart::new);
+        put(Login, 1, CEncryptionResponse::new);
         // play
     }
 
