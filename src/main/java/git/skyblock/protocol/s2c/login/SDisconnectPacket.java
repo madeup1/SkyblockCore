@@ -7,7 +7,7 @@ import git.skyblock.protocol.IServerPacket;
 
 public class SDisconnectPacket implements IServerPacket
 {
-    private ChatComponent reason;
+    private final ChatComponent reason;
     public SDisconnectPacket(String reason)
     {
         this.reason = new ChatComponent(reason);

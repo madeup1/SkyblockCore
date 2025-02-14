@@ -14,6 +14,7 @@ import git.skyblock.util.ZlibUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,8 +130,22 @@ public class PlayerConnection
             while (inputStream.available() > 0)
             {
                 int packetLen = PacketUtils.readVarInt(inputStream);
-
                 byte[] data = new byte[packetLen];
+
+                if (compressionThreshold != -1)
+                {
+                    int dataLength = PacketUtils.readVarInt(inputStream);
+                    int actualLength = packetLen - PacketUtils.getVarIntLength(dataLength);
+
+                    if (dataLength == 0)
+                    {
+                        data = new byte[actualLength];
+                    } else
+                    {
+                        data = new byte[dataLength];
+                    }
+                }
+
                 int check = inputStream.read(data);
 
                 if (cryptPair != null)
@@ -205,7 +220,42 @@ public class PlayerConnection
             buffer.write(usedData);
         }*/
 
-        
+        buffer.writeVarInt(packet.id(state));
+        packet.write(buffer);
+
+        byte[] data = buffer.compile();
+        buffer.clear();
+        boolean compress = (data.length >= compressionThreshold) && compressionThreshold != -1;
+
+        if (cryptPair != null)
+        {
+            data = cryptPair.encrypt(data);
+
+            SkyblockCore.logger().info("Encrypting");
+        }
+
+        int dataLength = data.length;
+
+        if (compress)
+        {
+            data = ZlibUtils.compress(data);
+
+            SkyblockCore.logger().info("Compressing");
+        }
+
+        if (compress)
+        {
+            int packetLen = data.length + PacketUtils.getVarIntLength(dataLength);
+
+            buffer.writeVarInt(packetLen);
+            buffer.writeVarInt(dataLength);
+        }
+        else
+        {
+            buffer.writeVarInt(dataLength);
+        }
+
+        buffer.write(data);
 
         try
         {
@@ -292,7 +342,7 @@ public class PlayerConnection
         return this.cryptPair;
     }
 
-    public void setSharedSecret(SecretKeySpec spec)
+    public void setSharedSecret(SecretKey spec)
     {
         this.cryptPair = new CryptPair(spec);
     }

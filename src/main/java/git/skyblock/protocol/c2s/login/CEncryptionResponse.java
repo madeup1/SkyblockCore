@@ -5,6 +5,8 @@ import git.skyblock.network.PlayerConnection;
 import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.protocol.ConnectionState;
 import git.skyblock.protocol.IClientPacket;
+import git.skyblock.protocol.s2c.login.SDisconnectPacket;
+import git.skyblock.protocol.s2c.play.SSetCompression;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -30,14 +32,12 @@ public class CEncryptionResponse implements IClientPacket
     public void process(PlayerConnection connection)
     {
         SkyblockCore.logger().info("Received response from client " + connection.name());
-
         SkyblockCore.logger().info("Length of sharedSecret is " + sharedSecret.length);
-
-        connection.setSharedSecret(new SecretKeySpec(sharedSecret, "RSA"));
-
+        connection.setSharedSecret(SkyblockCore.encryption().bytesToSecret(sharedSecret));
         SkyblockCore.logger().info("Length of verifyToken is " + verifyToken.length);
-
         connection.setState(ConnectionState.Play);
+
+        connection.sendPacket(new SDisconnectPacket("test"));
     }
 
     public CEncryptionResponse(FixedBuffer buffer)

@@ -1,30 +1,23 @@
 package git.skyblock.crypt;
 
+import git.skyblock.util.EncryptionUtils;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptPair
 {
     private Cipher sendCipher;
     private Cipher receiveCipher;
-    private SecretKeySpec sharedSecret;
+    private SecretKey sharedSecret;
 
-    public CryptPair(SecretKeySpec sharedSecret)
+    public CryptPair(SecretKey sharedSecret)
     {
-        try
-        {
-            this.sendCipher = Cipher.getInstance("RSA");
-            this.sendCipher.init(Cipher.ENCRYPT_MODE, sharedSecret);
-
-            this.receiveCipher = Cipher.getInstance("RSA");
-            this.receiveCipher.init(Cipher.DECRYPT_MODE, sharedSecret);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        this.sendCipher = EncryptionUtils.getCipher(1, sharedSecret);
+        this.receiveCipher = EncryptionUtils.getCipher(2, sharedSecret);
 
         this.sharedSecret = sharedSecret;
     }
@@ -33,7 +26,7 @@ public class CryptPair
     {
         try
         {
-            return this.sendCipher.doFinal(data);
+            return this.sendCipher.update(data);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -46,7 +39,7 @@ public class CryptPair
     {
         try
         {
-            return this.receiveCipher.doFinal(data);
+            return this.receiveCipher.update(data);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -55,7 +48,7 @@ public class CryptPair
         return new byte[0];
     }
 
-    public SecretKeySpec sharedSecret()
+    public SecretKey sharedSecret()
     {
         return this.sharedSecret;
     }

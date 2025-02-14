@@ -38,7 +38,6 @@ public class CLoginStart implements IClientPacket
         connection.setName(this.name);
 
         new Threadable(() -> {
-
             connection.sendPacket(new SEncryptionRequest("", SkyblockCore.encryption().keyPair().getPublic(), SkyblockCore.encryption().getRandomToken()));
             connection.authenticate();
 
