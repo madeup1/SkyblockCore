@@ -37,7 +37,7 @@ public class CEncryptionResponse implements IClientPacket
         SkyblockCore.logger().info("Length of verifyToken is " + verifyToken.length);
         connection.setState(ConnectionState.Play);
 
-        connection.sendPacket(new SDisconnectPacket("test"));
+        connection.sendPacket(new SDisconnectPacket("testafd"));
     }
 
     public CEncryptionResponse(FixedBuffer buffer)

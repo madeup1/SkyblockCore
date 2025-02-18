@@ -1,11 +1,14 @@
 package git.skyblock;
 
 import git.skyblock.crypt.EncryptionManager;
+import git.skyblock.events.EventBus;
+import git.skyblock.events.impl.PlayerLoginEvent;
 import git.skyblock.materials.MaterialRegistry;
 import git.skyblock.network.ConnectionManager;
 import git.skyblock.network.PlayerConnection;
 import git.skyblock.network.SocketListener;
 import git.skyblock.protocol.PacketManager;
+import git.skyblock.protocol.s2c.login.SDisconnectPacket;
 import git.skyblock.util.Logger;
 import git.skyblock.util.PerformanceProfiler;
 
@@ -19,6 +22,7 @@ public class SkyblockCore
     private static final SocketListener listener = new SocketListener();
     private static final PacketManager packets = new PacketManager();
     private static final EncryptionManager encryption = new EncryptionManager();
+    private static final EventBus events  = new EventBus("main");
     private static final Logger logger = new Logger("main");
 
     private static boolean running = false;
@@ -29,6 +33,11 @@ public class SkyblockCore
         profiler.start("init");
         materials.load("items.json");
         profiler.end("init");
+
+        events().register(PlayerLoginEvent.class, c -> {
+            c.connection().sendPacket(new SDisconnectPacket("ur bad this is eventbus gaming"));
+            c.connection().disconnect();
+        });
     }
 
     public static void start() throws Exception
@@ -109,6 +118,11 @@ public class SkyblockCore
     public static EncryptionManager encryption()
     {
         return encryption;
+    }
+
+    public static EventBus events()
+    {
+        return events;
     }
 
     public static Logger logger()

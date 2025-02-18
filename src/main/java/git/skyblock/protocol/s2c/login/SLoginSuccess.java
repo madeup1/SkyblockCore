@@ -13,7 +13,7 @@ public class SLoginSuccess implements IServerPacket
     @Override
     public int id(ConnectionState state)
     {
-        return 0;
+        return 0x02;
     }
 
     @Override

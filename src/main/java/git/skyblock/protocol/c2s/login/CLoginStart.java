@@ -1,6 +1,7 @@
 package git.skyblock.protocol.c2s.login;
 
 import git.skyblock.SkyblockCore;
+import git.skyblock.events.impl.PlayerLoginEvent;
 import git.skyblock.network.PlayerConnection;
 import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.optimizations.Threadable;
@@ -38,13 +39,15 @@ public class CLoginStart implements IClientPacket
         connection.setName(this.name);
 
         new Threadable(() -> {
-            connection.sendPacket(new SEncryptionRequest("", SkyblockCore.encryption().keyPair().getPublic(), SkyblockCore.encryption().getRandomToken()));
+            // TODO: add encryption
+            // connection.sendPacket(new SEncryptionRequest("", SkyblockCore.encryption().keyPair().getPublic(), SkyblockCore.encryption().getRandomToken()));
             connection.authenticate();
 
             if (!connection.authenticated())
             {
                 connection.sendPacket(new SDisconnectPacket("Not authenticated!"));
                 connection.disconnect();
+
                 return;
             }
 
@@ -52,12 +55,14 @@ public class CLoginStart implements IClientPacket
             {
                 connection.sendPacket(new SDisconnectPacket("Username is invalid!"));
                 connection.disconnect();
+
                 return;
             }
 
             connection.sendPacket(new SLoginSuccess(connection.uuid(), connection.name()));
-            // connection.setState(ConnectionState.Play);
+            connection.setState(ConnectionState.Play);
 
+            SkyblockCore.events().post(new PlayerLoginEvent(connection));
         }).start();
     }
 }

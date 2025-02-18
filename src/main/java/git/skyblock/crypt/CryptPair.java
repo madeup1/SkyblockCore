@@ -7,6 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
 
 public class CryptPair
 {
@@ -26,20 +27,24 @@ public class CryptPair
     {
         try
         {
-            return this.sendCipher.update(data);
+            int len = data.length;
+            int outSize = this.sendCipher.getOutputSize(len);
+            byte[] output = new byte[outSize];
+
+            this.sendCipher.update(data, 0, len, output);
+
+            return output;
         } catch (Exception e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return new byte[0];
     }
 
     public byte[] decrypt(byte[] data)
     {
         try
         {
-            return this.receiveCipher.update(data);
+            return this.receiveCipher.doFinal(data);
         } catch (Exception e)
         {
             e.printStackTrace();

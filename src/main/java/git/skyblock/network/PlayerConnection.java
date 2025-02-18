@@ -186,14 +186,15 @@ public class PlayerConnection
     {
         ExpandingBuffer buffer = new ExpandingBuffer();
 
-        // SkyblockCore.logger().info("id is " + packet.id(this.state));
+        /*SkyblockCore.logger().info("id is " + packet.id(this.state));
 
-        /*if (compressionThreshold == -1)
+        if (compressionThreshold == -1)
         {
             buffer.writeVarInt(packet.id(this.state));
             packet.write(buffer);
 
             byte[] data = buffer.compile();
+
             buffer.clear();
             buffer.writeVarInt(data.length);
             buffer.write(data);
@@ -227,12 +228,12 @@ public class PlayerConnection
         buffer.clear();
         boolean compress = (data.length >= compressionThreshold) && compressionThreshold != -1;
 
-        if (cryptPair != null)
+        /*if (cryptPair != null)
         {
             data = cryptPair.encrypt(data);
 
             SkyblockCore.logger().info("Encrypting");
-        }
+        }*/
 
         int dataLength = data.length;
 
