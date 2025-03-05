@@ -26,6 +26,10 @@ public class Flags
     @ServerFlag(value = "--multi-threaded", type = ServerFlagType.BOOLEAN)
     public static boolean MULTI_THREADED = false;
 
+    //compression
+    @ServerFlag(value = "--compression-level", type = ServerFlagType.INT)
+    public static int COMPRESSION_LEVEL = 256;
+
     public static void parse(String[] args)
     {
         Field[] flagFields = Flags.class.getFields();

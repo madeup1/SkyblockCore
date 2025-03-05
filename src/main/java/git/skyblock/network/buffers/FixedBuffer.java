@@ -147,6 +147,11 @@ public class FixedBuffer
         return value;
     }
 
+    public boolean readBoolean()
+    {
+        return this.readByte() == 0x01;
+    }
+
     public byte readByte()
     {
         return this.read(1)[0];

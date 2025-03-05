@@ -18,12 +18,6 @@ public class CHandshake implements IClientPacket
     public short serverPort;
     public ConnectionState state;
     @Override
-    public int id(ConnectionState state)
-    {
-        return 0;
-    }
-
-    @Override
     public void read(FixedBuffer buffer)
     {
         this.protocolVersion = buffer.readVarInt();

@@ -16,12 +16,6 @@ public class CEncryptionResponse implements IClientPacket
     private byte[] verifyToken;
 
     @Override
-    public int id(ConnectionState state)
-    {
-        return 0x01;
-    }
-
-    @Override
     public void read(FixedBuffer buffer)
     {
         this.sharedSecret = buffer.read(buffer.readVarInt());

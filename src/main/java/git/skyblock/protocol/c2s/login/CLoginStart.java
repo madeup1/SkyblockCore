@@ -10,6 +10,10 @@ import git.skyblock.protocol.IClientPacket;
 import git.skyblock.protocol.s2c.login.SDisconnectPacket;
 import git.skyblock.protocol.s2c.login.SEncryptionRequest;
 import git.skyblock.protocol.s2c.login.SLoginSuccess;
+import git.skyblock.protocol.s2c.play.SJoinGame;
+import git.skyblock.protocol.s2c.play.SSetCompression;
+import git.skyblock.protocol.s2c.play.SSpawnPosition;
+import git.skyblock.util.Flags;
 
 public class CLoginStart implements IClientPacket
 {
@@ -17,12 +21,6 @@ public class CLoginStart implements IClientPacket
     public CLoginStart(FixedBuffer buffer)
     {
         this.read(buffer);
-    }
-
-    @Override
-    public int id(ConnectionState state)
-    {
-        return 0;
     }
 
     @Override
@@ -62,7 +60,15 @@ public class CLoginStart implements IClientPacket
             connection.sendPacket(new SLoginSuccess(connection.uuid(), connection.name()));
             connection.setState(ConnectionState.Play);
 
+            connection.sendPacket(new SSetCompression(Flags.COMPRESSION_LEVEL));
+            connection.setCompression(Flags.COMPRESSION_LEVEL);
+
+            connection.sendPacket(new SJoinGame(connection));
+            connection.sendPacket(new SSpawnPosition(connection.player().world().spawnPosition()));
+
             SkyblockCore.events().post(new PlayerLoginEvent(connection));
+
+            connection.player().init();
         }).start();
     }
 }

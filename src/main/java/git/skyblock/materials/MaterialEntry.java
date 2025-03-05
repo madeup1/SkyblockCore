@@ -9,7 +9,7 @@ public class MaterialEntry
     private final int metadata;
     private final String namespace;
     private final String displayName;
-    public boolean isBlock = false;
+    public boolean isBlock = true;
     private int maxStackSize;
     public MaterialEntry(int id, int metadata, String namespace, String displayName, int maxStackSize)
     {
@@ -22,9 +22,7 @@ public class MaterialEntry
 
     public Block toBlock()
     {
-        if (this.isBlock)
-            return new Block(this);
-        return null;
+        return new Block(this);
     }
 
     public Item toItem()

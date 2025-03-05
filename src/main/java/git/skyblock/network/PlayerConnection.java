@@ -8,6 +8,7 @@ import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.protocol.ConnectionState;
 import git.skyblock.protocol.IClientPacket;
 import git.skyblock.protocol.IServerPacket;
+import git.skyblock.util.EntityUtils;
 import git.skyblock.util.Flags;
 import git.skyblock.util.PacketUtils;
 import git.skyblock.util.ZlibUtils;
@@ -63,70 +64,23 @@ public class PlayerConnection
         }
     }
 
+    public EntityPlayer player()
+    {
+        return this.localPlayer;
+    }
+
+    public void tick()
+    {
+        this.poll();
+
+        if (this.localPlayer != null)
+            this.localPlayer.tick();
+    }
+
     public void poll()
     {
         try
         {
-            /*if (inputStream.available() == 0)
-            {
-                return;
-            }
-
-            int len = inputStream.read();
-
-            if (len == -1)
-            {
-                this.disconnect();
-
-                return;
-            }
-
-            byte[] data = new byte[len];
-
-            int check = inputStream.read(data);
-
-            // put decryption here
-
-            if (compressionThreshold != -1)
-            {
-                FixedBuffer buffer = new FixedBuffer(data);
-                int packetLen = buffer.readVarInt();
-                int dataLen = buffer.readVarInt();
-
-                if (dataLen != 0)
-                {
-                    byte[] rest = buffer.remainder();
-                    buffer.setData(ZlibUtils.decompress(rest));
-                }
-            }
-
-            if (len == 0)
-            {
-                return;
-            }
-
-            FixedBuffer buffer = new FixedBuffer(data);
-            // TODO: Fix TCP not reading the varint of packet length ???
-            // int length = buffer.readVarInt();
-            int packId = buffer.readVarInt();
-
-            SkyblockCore.logger().info("PacketID is " + packId + "\n len is " + buffer.length() + "\n state is " + this.state);
-
-            Function<FixedBuffer, IClientPacket> consumer = SkyblockCore.packets().find(this.state, packId);
-            if (consumer == null)
-            {
-                // this.disconnect();
-
-                System.out.println("State is " + this.state);
-                System.out.println("Cant find the right packet! id is " + packId);
-
-                return;
-            }
-
-            IClientPacket packet = consumer.apply(buffer);
-            SkyblockCore.logger().info("Packet class is " + packet.getClass().getSimpleName());
-            packet.process(this);*/
-
             while (inputStream.available() > 0)
             {
                 int packetLen = PacketUtils.readVarInt(inputStream);
@@ -157,7 +111,7 @@ public class PlayerConnection
 
                 int packId = buffer.readVarInt();
 
-                SkyblockCore.logger().info("nerd info: packid: " + packId + " len: " + buffer.length());
+                //SkyblockCore.logger().info("nerd info: packid: " + packId + " len: " + buffer.length());
                 Function<FixedBuffer, IClientPacket> consumer = SkyblockCore.packets().find(this.state, packId);
                 if (consumer == null)
                 {
@@ -170,7 +124,7 @@ public class PlayerConnection
                 }
 
                 IClientPacket packet = consumer.apply(buffer);
-                SkyblockCore.logger().info("Packet class is " + packet.getClass().getSimpleName());
+                //SkyblockCore.logger().info("Packet class is " + packet.getClass().getSimpleName());
                 packet.process(this);
             }
         }
@@ -225,47 +179,56 @@ public class PlayerConnection
         packet.write(buffer);
 
         byte[] data = buffer.compile();
+
         buffer.clear();
+
         boolean compress = (data.length >= compressionThreshold) && compressionThreshold != -1;
 
-        /*if (cryptPair != null)
-        {
-            data = cryptPair.encrypt(data);
-
-            SkyblockCore.logger().info("Encrypting");
-        }*/
-
-        int dataLength = data.length;
+        int bonusLength = (compressionThreshold == -1 ? 0 : 1);
+        int preCompressLength = data.length;
 
         if (compress)
         {
             data = ZlibUtils.compress(data);
 
-            SkyblockCore.logger().info("Compressing");
+            // SkyblockCore.logger().info("Compressed packet is " + packet.getClass().getSimpleName());
         }
+
+        int dataLength = data.length;
 
         if (compress)
         {
-            int packetLen = data.length + PacketUtils.getVarIntLength(dataLength);
+            int packetLen = dataLength + PacketUtils.getVarIntLength(preCompressLength);
 
             buffer.writeVarInt(packetLen);
-            buffer.writeVarInt(dataLength);
+            buffer.writeVarInt(preCompressLength);
+
+            //SkyblockCore.logger().info("Packet Length: " + packetLen);
+            //SkyblockCore.logger().info("Data Length: " + preCompressLength);
+            //SkyblockCore.logger().info("Difference: " + (preCompressLength - packetLen));
+
         }
         else
         {
-            buffer.writeVarInt(dataLength);
+            buffer.writeVarInt(dataLength + bonusLength);
+            if (compressionThreshold != -1)
+                buffer.writeVarInt(0);
         }
 
         buffer.write(data);
 
+
         try
         {
-            SkyblockCore.logger().info("Packet size send is " + buffer.length());
+            //SkyblockCore.logger().info("Packet size send is " + buffer.length());
+            //SkyblockCore.logger().info("Packet length = " + (dataLength + bonusLength));
             this.outputStream.write(buffer.compile());
             // this.outputStream.flush();
         } catch (IOException e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
+
+            this.disconnect();
         }
     }
 
@@ -320,6 +283,11 @@ public class PlayerConnection
     public boolean authenticated()
     {
         return this.authenticated;
+    }
+
+    public void setCompression(int level)
+    {
+        this.compressionThreshold = level;
     }
 
     public void disconnect()

@@ -4,8 +4,10 @@ import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.protocol.c2s.handshake.CHandshake;
 import git.skyblock.protocol.c2s.login.CEncryptionResponse;
 import git.skyblock.protocol.c2s.login.CLoginStart;
+import git.skyblock.protocol.c2s.play.*;
 import git.skyblock.protocol.c2s.status.CStatusPing;
 import git.skyblock.protocol.c2s.status.CStatusRequest;
+import git.skyblock.protocol.s2c.play.SMapChunkBulk;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -32,6 +34,16 @@ public class PacketManager
         put(Login, 0, CLoginStart::new);
         put(Login, 1, CEncryptionResponse::new);
         // play
+        put(Play, 0x00, CKeepAlive::new);
+        put(Play, 0x01, CChatMessage::new);
+        put(Play, 0x03, CPacketPlayer::new);
+        put(Play, 0x04, CPlayerPosition::new);
+        put(Play, 0x05, CPlayerLook::new);
+        put(Play, 0x06, CPlayerPositionLook::new);
+        put(Play, 0x13, CPlayerAbilities::new);
+        put(Play, 0x15, CClientSettings::new);
+        put(Play, 0x16, CClientStatus::new);
+        put(Play, 0x17, CPluginMessage::new);
     }
 
     public void put(ConnectionState state, int id, Function<FixedBuffer, IClientPacket> consumer)

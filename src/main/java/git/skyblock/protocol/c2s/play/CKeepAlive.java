@@ -1,15 +1,16 @@
-package git.skyblock.protocol.c2s.status;
+package git.skyblock.protocol.c2s.play;
 
 import git.skyblock.network.PlayerConnection;
 import git.skyblock.network.buffers.FixedBuffer;
 import git.skyblock.protocol.ConnectionState;
 import git.skyblock.protocol.IClientPacket;
-import git.skyblock.protocol.s2c.status.SStatusPong;
 
-public class CStatusPing implements IClientPacket
+public class CKeepAlive implements IClientPacket
 {
-    public long time;
-    public CStatusPing(FixedBuffer buffer)
+
+
+
+    public CKeepAlive(FixedBuffer buffer)
     {
         this.read(buffer);
     }
@@ -17,12 +18,12 @@ public class CStatusPing implements IClientPacket
     @Override
     public void read(FixedBuffer buffer)
     {
-        this.time = buffer.readLong();
+
     }
 
     @Override
     public void process(PlayerConnection connection)
     {
-        connection.sendPacket(new SStatusPong(this.time));
+
     }
 }

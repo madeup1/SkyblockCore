@@ -1,6 +1,8 @@
 package git.skyblock.network.buffers;
 
 import git.skyblock.SkyblockCore;
+import git.skyblock.position.BlockPos;
+import git.skyblock.position.Vec3;
 import git.skyblock.util.Flags;
 import git.skyblock.util.PacketUtils;
 
@@ -112,8 +114,14 @@ public class ExpandingBuffer
     public void writeString(String value)
     {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        this.writeVarInt(bytes.length);
+
+        this.writeVarInt(value.length());
         this.write(bytes);
+    }
+
+    public void writeBoolean(boolean value)
+    {
+        this.writeByte((byte) (value ? 0x01 : 0x00));
     }
 
     public void writeShort(short value)
@@ -143,6 +151,25 @@ public class ExpandingBuffer
         BufferSegment segment = new BufferSegment(data, data.length);
 
         this.length += data.length;
+
+        this.links.addLast(segment);
+    }
+
+    public void writeVec3(Vec3 vec)
+    {
+        this.writeDouble(vec.x());
+        this.writeDouble(vec.y());
+        this.writeDouble(vec.z());
+    }
+
+    public void writeBlockPos(BlockPos pos)
+    {
+        this.writeLong(((long) (pos.x() & 0x3FFFFFF) << 38) | ((long) (pos.y() & 0xFFF) << 26) | (pos.z() & 0x3FFFFFF));
+    }
+
+    public void writeSegment(BufferSegment segment)
+    {
+        this.length += segment.length();
 
         this.links.addLast(segment);
     }
@@ -205,6 +232,6 @@ public class ExpandingBuffer
         return this.compile();
     }
 
-    private record BufferSegment(byte[] data, int length)
+    public record BufferSegment(byte[] data, int length)
     {}
 }

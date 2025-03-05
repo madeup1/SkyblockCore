@@ -16,12 +16,6 @@ public class CStatusRequest implements IClientPacket
     }
 
     @Override
-    public int id(ConnectionState state)
-    {
-        return 0;
-    }
-
-    @Override
     public void read(FixedBuffer buffer)
     {
 
